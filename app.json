@@ -26,8 +26,7 @@
         {
           "locationWhenInUsePermission": "Allow Attendance to store your location with each attendance mark."
         }
-      ],
-      "expo-font"
+      ]
     ],
     "experiments": {
       "typedRoutes": true

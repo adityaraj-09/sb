@@ -5,7 +5,7 @@ import { Alert, StyleSheet, Text, View } from 'react-native';
 import { Card, ErrorText, Field, PrimaryButton, Screen, Subtitle, Title } from '../components/ui';
 import { useApp } from '../context/AppProvider';
 import { DEMO } from '../lib/storage';
-import { colors, space } from '../theme';
+import { colors, fonts, space } from '../theme';
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -35,9 +35,9 @@ export default function LoginScreen() {
   return (
     <Screen>
       <View style={styles.hero}>
-        <Text style={styles.kicker}>On-device attendance</Text>
+        <Text style={styles.brand}>ATTENDANCE</Text>
         <Title>Sign in</Title>
-        <Subtitle>Dummy accounts. Everything stays in app storage on this phone.</Subtitle>
+        <Subtitle>Local accounts only. Nothing leaves this phone.</Subtitle>
       </View>
 
       <View style={styles.form}>
@@ -50,19 +50,23 @@ export default function LoginScreen() {
           secureTextEntry
         />
         <ErrorText message={error} />
-        <PrimaryButton title="Login" onPress={() => void onSubmit()} loading={loading} />
+        <PrimaryButton title="Continue" onPress={() => void onSubmit()} loading={loading} />
       </View>
 
       <Card>
         <Text style={styles.hintTitle}>Demo credentials</Text>
-        <Text style={styles.hint}>Admin — {DEMO.admin.username} / {DEMO.admin.password}</Text>
         <Text style={styles.hint}>
-          Staff — {DEMO.staff.username} / {DEMO.staff.password} (enrol a face first)
+          admin / {DEMO.admin.password}
+        </Text>
+        <Text style={styles.hint}>
+          EMP001 / {DEMO.staff.password}
         </Text>
       </Card>
 
+      <View style={{ flex: 1 }} />
+
       <PrimaryButton
-        title="Reset local demo data"
+        title="Reset local data"
         tone="ghost"
         onPress={() => {
           Alert.alert('Reset this phone?', 'Staff, faces, and attendance on this device will be cleared.', [
@@ -84,25 +88,28 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   hero: {
     paddingTop: space.xl,
-    marginBottom: space.lg,
+    marginBottom: 28,
   },
-  kicker: {
-    color: colors.accent,
-    fontWeight: '700',
-    marginBottom: 8,
-    letterSpacing: 0.4,
+  brand: {
+    color: colors.muted,
+    fontFamily: fonts.monoMedium,
+    fontSize: 12,
+    letterSpacing: 2.4,
+    marginBottom: 18,
   },
   form: {
     gap: space.md,
     marginBottom: space.lg,
   },
   hintTitle: {
-    fontWeight: '700',
+    fontFamily: fonts.sansMedium,
     color: colors.ink,
-    marginBottom: 6,
+    marginBottom: 8,
   },
   hint: {
     color: colors.muted,
-    lineHeight: 20,
+    fontFamily: fonts.mono,
+    fontSize: 13,
+    lineHeight: 22,
   },
 });

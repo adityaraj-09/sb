@@ -8,7 +8,7 @@ import { useApp } from '../../context/AppProvider';
 import { facesMatch, MATCH_THRESHOLD } from '../../lib/face';
 import { createId } from '../../lib/ids';
 import { getRequiredLocation, type Coordinates } from '../../lib/location';
-import { colors, space } from '../../theme';
+import { colors, fonts, space } from '../../theme';
 
 export default function MarkAttendanceScreen() {
   const router = useRouter();
@@ -134,6 +134,8 @@ const styles = StyleSheet.create({
   },
   coords: {
     color: colors.muted,
-    marginTop: 4,
+    marginTop: 8,
+    fontFamily: fonts.mono,
+    fontSize: 12,
   },
 });

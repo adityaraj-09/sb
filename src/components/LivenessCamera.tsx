@@ -6,7 +6,7 @@ import { persistPhoto } from '../lib/files';
 import { analyzeFrame, hasUsableFace } from '../lib/face';
 import { embeddingFromUri, imageFromUri } from '../lib/image';
 import { createLivenessSession, reduceLiveness } from '../lib/liveness';
-import { colors, radius } from '../theme';
+import { colors, fonts, radius } from '../theme';
 import type { Challenge, LivenessSession } from '../types';
 import { ErrorText, PrimaryButton } from './ui';
 
@@ -170,8 +170,10 @@ const styles = StyleSheet.create({
   },
   camera: {
     flex: 1,
-    borderRadius: radius.lg,
+    borderRadius: radius.md,
     overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: colors.line,
   },
   oval: {
     position: 'absolute',
@@ -180,25 +182,29 @@ const styles = StyleSheet.create({
     right: '16%',
     height: '48%',
     borderRadius: 999,
-    borderWidth: 3,
+    borderWidth: 1.5,
     borderColor: colors.oval,
   },
   banner: {
-    backgroundColor: colors.primary,
+    backgroundColor: colors.card,
     borderRadius: radius.md,
+    borderWidth: 1,
+    borderColor: colors.line,
     padding: 14,
   },
   bannerKicker: {
-    color: 'rgba(255,255,255,0.72)',
-    fontSize: 12,
-    fontWeight: '700',
+    color: colors.muted,
+    fontSize: 11,
+    letterSpacing: 1.2,
+    fontFamily: fonts.monoMedium,
     textTransform: 'uppercase',
-    marginBottom: 4,
+    marginBottom: 6,
   },
   bannerText: {
-    color: '#fff',
+    color: colors.ink,
     fontSize: 18,
-    fontWeight: '700',
+    letterSpacing: -0.3,
+    fontFamily: fonts.sansSemi,
   },
   center: {
     flex: 1,
@@ -207,6 +213,7 @@ const styles = StyleSheet.create({
   },
   copy: {
     fontSize: 16,
+    fontFamily: fonts.sans,
     color: colors.ink,
     textAlign: 'center',
   },

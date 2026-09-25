@@ -3,7 +3,7 @@ import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { Pill, PrimaryButton, Screen, Subtitle, Title } from '../../components/ui';
 import { useApp } from '../../context/AppProvider';
-import { colors, radius, space } from '../../theme';
+import { colors, fonts, radius, space } from '../../theme';
 
 export default function StaffListScreen() {
   const router = useRouter();
@@ -19,10 +19,9 @@ export default function StaffListScreen() {
   return (
     <Screen>
       <View style={styles.header}>
-        <View style={{ flex: 1 }}>
-          <Title>Staff</Title>
-          <Subtitle>Add people, open a profile, and enrol a face for attendance.</Subtitle>
-        </View>
+        <Text style={styles.brand}>ADMIN</Text>
+        <Title>Staff</Title>
+        <Subtitle>Add people, open a profile, and enrol a face.</Subtitle>
       </View>
 
       <PrimaryButton title="Add staff member" onPress={() => router.push('/admin/add')} />
@@ -40,7 +39,7 @@ export default function StaffListScreen() {
                 <Text style={styles.meta}>{item.employeeId}</Text>
               </View>
               <Pill
-                label={item.faceEmbedding ? 'Face enrolled' : 'Not enrolled'}
+                label={item.faceEmbedding ? 'Enrolled' : 'Not enrolled'}
                 tone={item.faceEmbedding ? 'success' : 'warn'}
               />
             </Pressable>
@@ -58,32 +57,43 @@ const styles = StyleSheet.create({
     paddingTop: space.sm,
     marginBottom: space.md,
   },
+  brand: {
+    color: colors.muted,
+    fontFamily: fonts.monoMedium,
+    fontSize: 11,
+    letterSpacing: 2,
+    marginBottom: 10,
+  },
   list: {
     paddingVertical: space.md,
-    gap: space.sm,
+    gap: 8,
   },
   row: {
     backgroundColor: colors.card,
     borderColor: colors.line,
     borderWidth: 1,
     borderRadius: radius.md,
-    padding: space.md,
+    padding: 14,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
   },
   name: {
-    fontSize: 17,
-    fontWeight: '700',
+    fontSize: 16,
+    fontFamily: fonts.sansMedium,
     color: colors.ink,
   },
   meta: {
-    marginTop: 2,
+    marginTop: 3,
     color: colors.muted,
+    fontFamily: fonts.mono,
+    fontSize: 12,
+    letterSpacing: 0.4,
   },
   empty: {
     textAlign: 'center',
     color: colors.muted,
+    fontFamily: fonts.sans,
     paddingVertical: space.xl,
   },
 });

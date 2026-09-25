@@ -26,14 +26,14 @@ Camera and location need a **real device**. The Android emulator camera is a poo
 
 ### Android APK
 
-A debug-signed release APK was built in this workspace (`android/app/build/outputs/apk/release/app-release.apk`, also saved as the `attendance-release.apk` artifact). It is signed with the Android debug keystore, which is fine for assignment review. Use a real Android device; this is not Play Store signing.
+A debug-signed **arm64-v8a** release APK was built here (`attendance_arm64_release.apk`, ~51 MB). It is signed with the Android debug keystore, which is fine for assignment review on a real phone. This is not Play Store signing.
 
 Rebuild locally:
 
 ```bash
 npx expo prebuild --platform android
 # ANDROID_HOME must include platform android-36, build-tools 36.0.0, NDK 27.1.12297006
-cd android && ./gradlew assembleRelease
+cd android && ./gradlew assembleRelease -PreactNativeArchitectures=arm64-v8a
 ```
 
 Or with EAS (requires an Expo login):
@@ -47,6 +47,7 @@ npx eas-cli build --platform android --profile preview
 ## Technology / architecture
 
 - **Expo SDK 57 + React Native + TypeScript**
+- **Dark Cursor-like UI** — near-black chrome (`#0A0A0A`), white text, hairline borders, white primary buttons. Open fonts **Geist Sans** + **Geist Mono** stand in for Cursor Gothic / Berkeley Mono (those two are proprietary).
 - **Expo Router** for Admin vs Staff stacks
 - **AsyncStorage** for users, staff, face embeddings, attendance rows, and session
 - **expo-file-system** for enrolled faces (`faces/{staffId}.jpg`) and attendance selfies (`attendance/{id}.jpg`)

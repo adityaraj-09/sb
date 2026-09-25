@@ -1,18 +1,10 @@
 import { Stack } from 'expo-router';
 
-import { colors } from '../../theme';
+import { stackScreenOptions } from '../../theme';
 
 export default function AdminLayout() {
   return (
-    <Stack
-      screenOptions={{
-        headerShadowVisible: false,
-        headerStyle: { backgroundColor: colors.bg },
-        headerTintColor: colors.primary,
-        headerTitleStyle: { color: colors.ink, fontWeight: '700' },
-        contentStyle: { backgroundColor: colors.bg },
-      }}
-    >
+    <Stack screenOptions={stackScreenOptions}>
       <Stack.Screen name="index" options={{ title: 'Staff' }} />
       <Stack.Screen name="add" options={{ title: 'Add staff', presentation: 'modal' }} />
       <Stack.Screen name="[staffId]" options={{ title: 'Profile' }} />

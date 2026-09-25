@@ -5,11 +5,12 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "dark",
     "scheme": "attendance",
     "newArchEnabled": true,
     "plugins": [
       "expo-router",
+      "expo-font",
       "expo-image",
       [
         "expo-camera",
@@ -25,7 +26,8 @@
         {
           "locationWhenInUsePermission": "Allow Attendance to store your location with each attendance mark."
         }
-      ]
+      ],
+      "expo-font"
     ],
     "experiments": {
       "typedRoutes": true
@@ -41,7 +43,7 @@
     "android": {
       "package": "com.attendance.app",
       "adaptiveIcon": {
-        "backgroundColor": "#0F3D3E",
+        "backgroundColor": "#0A0A0A",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"

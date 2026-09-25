@@ -4,7 +4,7 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { Card, Pill, PrimaryButton, Screen, Subtitle, Title } from '../../components/ui';
 import { useApp } from '../../context/AppProvider';
-import { colors, space } from '../../theme';
+import { colors, fonts, radius, space } from '../../theme';
 
 function formatWhen(value: string): string {
   return new Date(value).toLocaleString();
@@ -27,10 +27,11 @@ export default function StaffHomeScreen() {
   return (
     <Screen>
       <ScrollView contentContainerStyle={styles.content}>
+        <Text style={styles.brand}>STAFF</Text>
         <Title>{currentStaff?.name ?? 'Staff'}</Title>
         <Subtitle>{currentStaff?.employeeId ?? 'Unknown staff record'}</Subtitle>
         <Pill
-          label={enrolled ? 'Ready to mark attendance' : 'Ask admin to enrol your face'}
+          label={enrolled ? 'Ready' : 'Ask admin to enrol your face'}
           tone={enrolled ? 'success' : 'warn'}
         />
 
@@ -40,7 +41,7 @@ export default function StaffHomeScreen() {
           onPress={() => router.push('/staff/mark')}
         />
 
-        <Text style={styles.section}>Your history</Text>
+        <Text style={styles.section}>History</Text>
         {history.length === 0 ? (
           <Text style={styles.empty}>No attendance on this phone yet.</Text>
         ) : (
@@ -69,14 +70,23 @@ const styles = StyleSheet.create({
     paddingBottom: space.xl,
     gap: space.md,
   },
+  brand: {
+    color: colors.muted,
+    fontFamily: fonts.monoMedium,
+    fontSize: 11,
+    letterSpacing: 2,
+  },
   section: {
     marginTop: space.sm,
-    fontSize: 18,
-    fontWeight: '700',
-    color: colors.ink,
+    fontSize: 13,
+    letterSpacing: 1.2,
+    textTransform: 'uppercase',
+    fontFamily: fonts.monoMedium,
+    color: colors.muted,
   },
   empty: {
     color: colors.muted,
+    fontFamily: fonts.sans,
   },
   row: {
     flexDirection: 'row',
@@ -84,17 +94,21 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   thumb: {
-    width: 64,
-    height: 64,
-    borderRadius: 10,
-    backgroundColor: colors.line,
+    width: 56,
+    height: 56,
+    borderRadius: radius.sm,
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.line,
   },
   when: {
-    fontWeight: '700',
+    fontFamily: fonts.sansMedium,
     color: colors.ink,
   },
   meta: {
     color: colors.muted,
-    marginTop: 2,
+    marginTop: 3,
+    fontFamily: fonts.mono,
+    fontSize: 12,
   },
 });

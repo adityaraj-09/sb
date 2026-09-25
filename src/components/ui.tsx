@@ -11,13 +11,13 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { colors, radius, space } from '../theme';
+import { colors, fonts, radius, space } from '../theme';
 
 export function Screen({
   children,
   style,
 }: {
-  children: React.ReactNode;
+  children: ReactNode;
   style?: StyleProp<ViewStyle>;
 }) {
   return (
@@ -27,19 +27,29 @@ export function Screen({
   );
 }
 
-export function Title({ children }: { children: React.ReactNode }) {
+export function Title({ children }: { children: ReactNode }) {
   return <Text style={styles.title}>{children}</Text>;
 }
 
-export function Subtitle({ children }: { children: React.ReactNode }) {
+export function Subtitle({ children }: { children: ReactNode }) {
   return <Text style={styles.subtitle}>{children}</Text>;
+}
+
+export function Mono({
+  children,
+  style,
+}: {
+  children: ReactNode;
+  style?: StyleProp<ViewStyle>;
+}) {
+  return <Text style={[styles.mono, style as object]}>{children}</Text>;
 }
 
 export function Card({
   children,
   style,
 }: {
-  children: React.ReactNode;
+  children: ReactNode;
   style?: StyleProp<ViewStyle>;
 }) {
   return <View style={[styles.card, style]}>{children}</View>;
@@ -67,10 +77,11 @@ export function Field({
         value={value}
         onChangeText={onChangeText}
         placeholder={placeholder}
-        placeholderTextColor={colors.muted}
+        placeholderTextColor={colors.faint}
         secureTextEntry={secureTextEntry}
         autoCapitalize={autoCapitalize}
         autoCorrect={false}
+        selectionColor={colors.ink}
         style={styles.input}
       />
     </View>
@@ -103,9 +114,15 @@ export function PrimaryButton({
       ]}
     >
       {loading ? (
-        <ActivityIndicator color={tone === 'ghost' ? colors.primary : '#fff'} />
+        <ActivityIndicator color={tone === 'primary' ? colors.primaryInk : colors.ink} />
       ) : (
-        <Text style={[styles.buttonText, tone === 'ghost' && styles.buttonGhostText]}>
+        <Text
+          style={[
+            styles.buttonText,
+            tone === 'ghost' && styles.buttonGhostText,
+            tone === 'danger' && styles.buttonDangerText,
+          ]}
+        >
           {title}
         </Text>
       )}
@@ -138,8 +155,8 @@ export function Pill({
       <Text
         style={[
           styles.pillText,
-          tone === 'success' && { color: colors.success },
-          tone === 'warn' && { color: colors.warn },
+          tone === 'success' && styles.pillSuccessText,
+          tone === 'warn' && styles.pillWarnText,
         ]}
       >
         {label}
@@ -155,15 +172,23 @@ const styles = StyleSheet.create({
     paddingHorizontal: space.lg,
   },
   title: {
-    fontSize: 28,
-    fontWeight: '700',
+    fontSize: 32,
+    lineHeight: 36,
+    letterSpacing: -0.8,
+    fontFamily: fonts.sansSemi,
     color: colors.ink,
   },
   subtitle: {
-    marginTop: 6,
+    marginTop: 8,
     fontSize: 15,
-    lineHeight: 21,
+    lineHeight: 22,
+    fontFamily: fonts.sans,
     color: colors.muted,
+  },
+  mono: {
+    fontFamily: fonts.mono,
+    color: colors.muted,
+    fontSize: 13,
   },
   card: {
     backgroundColor: colors.card,
@@ -173,33 +198,38 @@ const styles = StyleSheet.create({
     borderColor: colors.line,
   },
   field: {
-    gap: 6,
+    gap: 8,
   },
   label: {
-    fontSize: 13,
-    fontWeight: '600',
+    fontSize: 12,
+    letterSpacing: 0.6,
+    textTransform: 'uppercase',
+    fontFamily: fonts.monoMedium,
     color: colors.muted,
   },
   input: {
-    backgroundColor: colors.card,
+    backgroundColor: colors.surface,
     borderColor: colors.line,
     borderWidth: 1,
     borderRadius: radius.sm,
     paddingHorizontal: 14,
-    paddingVertical: 12,
+    paddingVertical: 13,
     fontSize: 16,
     color: colors.ink,
+    fontFamily: fonts.sans,
   },
   button: {
     backgroundColor: colors.primary,
     borderRadius: radius.sm,
-    minHeight: 50,
+    minHeight: 48,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: space.md,
   },
   buttonDanger: {
-    backgroundColor: colors.danger,
+    backgroundColor: 'transparent',
+    borderWidth: 1,
+    borderColor: colors.lineStrong,
   },
   buttonGhost: {
     backgroundColor: 'transparent',
@@ -207,39 +237,57 @@ const styles = StyleSheet.create({
     borderColor: colors.line,
   },
   buttonDisabled: {
-    opacity: 0.5,
+    opacity: 0.38,
   },
   buttonPressed: {
-    opacity: 0.85,
+    opacity: 0.82,
   },
   buttonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '700',
+    color: colors.primaryInk,
+    fontSize: 15,
+    fontFamily: fonts.sansMedium,
   },
   buttonGhostText: {
-    color: colors.primary,
+    color: colors.ink,
+  },
+  buttonDangerText: {
+    color: colors.ink,
   },
   error: {
-    color: colors.danger,
+    color: colors.ink,
     fontSize: 14,
+    fontFamily: fonts.sans,
+    borderLeftWidth: 2,
+    borderLeftColor: colors.ink,
+    paddingLeft: 10,
   },
   pill: {
     alignSelf: 'flex-start',
     borderRadius: 999,
     paddingHorizontal: 10,
-    paddingVertical: 4,
-    backgroundColor: '#E8EEEE',
+    paddingVertical: 5,
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.line,
   },
   pillSuccess: {
-    backgroundColor: '#E4F6EC',
+    backgroundColor: colors.primary,
+    borderColor: colors.primary,
   },
   pillWarn: {
-    backgroundColor: '#F8EFD9',
+    backgroundColor: 'transparent',
+    borderColor: colors.lineStrong,
   },
   pillText: {
-    fontSize: 12,
-    fontWeight: '700',
+    fontSize: 11,
+    letterSpacing: 0.4,
+    fontFamily: fonts.monoMedium,
     color: colors.muted,
+  },
+  pillSuccessText: {
+    color: colors.primaryInk,
+  },
+  pillWarnText: {
+    color: colors.warn,
   },
 });

@@ -25,26 +25,40 @@ type Props = {
 export function LivenessCamera({ mode, fileId, onCaptured }: Props) {
   const cameraRef = useRef<CameraView>(null);
   const busyRef = useRef(false);
+  const completedRef = useRef(false);
   const sessionRef = useRef<LivenessSession>(createLivenessSession(Date.now()));
+  const onCapturedRef = useRef(onCaptured);
   const [permission, requestPermission] = useCameraPermissions();
+  const [cameraReady, setCameraReady] = useState(false);
   const [session, setSession] = useState(sessionRef.current);
   const [error, setError] = useState<string | null>(null);
   const [finishing, setFinishing] = useState(false);
 
+  onCapturedRef.current = onCaptured;
+
+  const resetSession = () => {
+    completedRef.current = false;
+    sessionRef.current = createLivenessSession(Date.now());
+    setSession(sessionRef.current);
+    setFinishing(false);
+    setError(null);
+  };
+
   useEffect(() => {
-    if (!permission?.granted || finishing) {
+    const terminal = session.phase === 'failed' || session.phase === 'passed' || finishing;
+    if (!permission?.granted || !cameraReady || terminal) {
       return;
     }
 
     const timer = setInterval(() => {
       void sampleFrame();
-    }, 750);
+    }, 900);
 
     return () => clearInterval(timer);
-  }, [permission?.granted, finishing]);
+  }, [permission?.granted, cameraReady, session.phase, finishing]);
 
   const sampleFrame = async () => {
-    if (busyRef.current || finishing) {
+    if (busyRef.current || finishing || completedRef.current) {
       return;
     }
     const camera = cameraRef.current;
@@ -54,10 +68,8 @@ export function LivenessCamera({ mode, fileId, onCaptured }: Props) {
     busyRef.current = true;
     try {
       const photo = await camera.takePictureAsync({
-        quality: 0.35,
-        skipProcessing: true,
+        quality: 0.4,
         shutterSound: false,
-        mirror: true,
       });
       if (!photo?.uri) {
         return;
@@ -68,38 +80,39 @@ export function LivenessCamera({ mode, fileId, onCaptured }: Props) {
       sessionRef.current = next;
       setSession(next);
 
-      if (next.phase === 'passed') {
-        setFinishing(true);
-        const finalPhoto = await camera.takePictureAsync({
-          quality: 0.8,
-          skipProcessing: false,
-          shutterSound: false,
-          mirror: true,
-        });
-        if (!finalPhoto?.uri) {
-          throw new Error('Could not capture selfie');
-        }
-        const finalImage = await imageFromUri(finalPhoto.uri, { size: 96 });
-        if (!hasUsableFace(analyzeFrame(finalImage))) {
-          throw new Error('Final selfie did not contain a clear face');
-        }
-        const embedding = await embeddingFromUri(finalPhoto.uri);
-        const stored = await persistPhoto(
-          finalPhoto.uri,
-          mode === 'enrol' ? 'faces' : 'attendance',
-          fileId,
-        );
-        onCaptured({
-          uri: stored,
-          embedding,
-          challenge: next.challenge,
-        });
+      if (next.phase !== 'passed' || completedRef.current) {
+        return;
       }
+      completedRef.current = true;
+      setFinishing(true);
+
+      const finalPhoto = await camera.takePictureAsync({
+        quality: 0.8,
+        shutterSound: false,
+      });
+      if (!finalPhoto?.uri) {
+        throw new Error('Could not capture selfie');
+      }
+      const finalImage = await imageFromUri(finalPhoto.uri, { size: 96 });
+      if (!hasUsableFace(analyzeFrame(finalImage))) {
+        throw new Error('Final selfie did not contain a clear face');
+      }
+      const embedding = await embeddingFromUri(finalPhoto.uri);
+      const stored = await persistPhoto(
+        finalPhoto.uri,
+        mode === 'enrol' ? 'faces' : 'attendance',
+        fileId,
+      );
+      onCapturedRef.current({
+        uri: stored,
+        embedding,
+        challenge: next.challenge,
+      });
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : 'Camera capture failed');
-      sessionRef.current = createLivenessSession(Date.now());
-      setSession(sessionRef.current);
-      setFinishing(false);
+      if (completedRef.current || finishing) {
+        setError(caught instanceof Error ? caught.message : 'Camera capture failed');
+        resetSession();
+      }
     } finally {
       busyRef.current = false;
     }
@@ -129,11 +142,14 @@ export function LivenessCamera({ mode, fileId, onCaptured }: Props) {
         mirror
         animateShutter={false}
         mode="picture"
+        onCameraReady={() => setCameraReady(true)}
+        onMountError={() => setError('Could not start the camera')}
       />
       <View style={styles.oval} pointerEvents="none" />
       <View style={styles.banner}>
         <Text style={styles.bannerKicker}>
-          {mode === 'enrol' ? 'Enrol face' : 'Mark attendance'} · {session.challenge.replace('_', ' ')}
+          {mode === 'enrol' ? 'Enrol face' : 'Mark attendance'} ·{' '}
+          {session.challenge.replaceAll('_', ' ')}
         </Text>
         <Text style={styles.bannerText}>
           {finishing ? 'Saving selfie…' : session.instruction}
@@ -141,15 +157,7 @@ export function LivenessCamera({ mode, fileId, onCaptured }: Props) {
       </View>
       <ErrorText message={error} />
       {session.phase === 'failed' ? (
-        <PrimaryButton
-          title="Try again"
-          onPress={() => {
-            setError(null);
-            sessionRef.current = createLivenessSession(Date.now());
-            setSession(sessionRef.current);
-            setFinishing(false);
-          }}
-        />
+        <PrimaryButton title="Try again" onPress={resetSession} />
       ) : null}
     </View>
   );

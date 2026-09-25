@@ -24,6 +24,13 @@ describe('liveness state machine', () => {
     expect(session.phase).toBe('passed');
   });
 
+  it('accepts a mirrored rightward turn for a left instruction', () => {
+    let session = createLivenessSession(0, 'turn_left');
+    session = reduceLiveness(session, features(), 10);
+    session = reduceLiveness(session, features({ shiftX: 0.16 }), 200);
+    expect(session.phase).toBe('return_center');
+  });
+
   it('passes a blink challenge', () => {
     let session = createLivenessSession(0, 'blink');
     session = reduceLiveness(session, features(), 10);

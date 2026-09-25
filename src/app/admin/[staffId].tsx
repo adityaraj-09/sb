@@ -4,6 +4,7 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { Card, Pill, PrimaryButton, Screen, Subtitle, Title } from '../../components/ui';
 import { useApp } from '../../context/AppProvider';
+import { firstParam } from '../../lib/params';
 import { colors, space } from '../../theme';
 
 function formatWhen(value: string): string {
@@ -12,7 +13,7 @@ function formatWhen(value: string): string {
 
 export default function StaffProfileScreen() {
   const router = useRouter();
-  const { staffId } = useLocalSearchParams<{ staffId: string }>();
+  const staffId = firstParam(useLocalSearchParams<{ staffId: string | string[] }>().staffId);
   const { session, staff, records } = useApp();
   const person = staff.find((item) => item.id === staffId);
   const history = records.filter((item) => item.staffId === staffId);

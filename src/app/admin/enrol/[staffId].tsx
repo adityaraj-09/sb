@@ -4,11 +4,12 @@ import { Alert, StyleSheet, View } from 'react-native';
 import { LivenessCamera } from '../../../components/LivenessCamera';
 import { Screen, Subtitle, Title } from '../../../components/ui';
 import { useApp } from '../../../context/AppProvider';
+import { firstParam } from '../../../lib/params';
 import { space } from '../../../theme';
 
 export default function EnrolFaceScreen() {
   const router = useRouter();
-  const { staffId } = useLocalSearchParams<{ staffId: string }>();
+  const staffId = firstParam(useLocalSearchParams<{ staffId: string | string[] }>().staffId);
   const { session, staff, enrolFace } = useApp();
   const person = staff.find((item) => item.id === staffId);
 
@@ -33,11 +34,18 @@ export default function EnrolFaceScreen() {
         mode="enrol"
         fileId={person.id}
         onCaptured={({ uri, embedding }) => {
-          void enrolFace(person.id, uri, embedding).then(() => {
-            Alert.alert('Face enrolled', `${person.name} can now mark attendance.`, [
-              { text: 'OK', onPress: () => router.back() },
-            ]);
-          });
+          void enrolFace(person.id, uri, embedding)
+            .then(() => {
+              Alert.alert('Face enrolled', `${person.name} can now mark attendance.`, [
+                { text: 'OK', onPress: () => router.back() },
+              ]);
+            })
+            .catch((error: unknown) => {
+              Alert.alert(
+                'Could not save face',
+                error instanceof Error ? error.message : 'Please try again.',
+              );
+            });
         }}
       />
     </Screen>

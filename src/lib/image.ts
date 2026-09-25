@@ -14,20 +14,22 @@ async function toJpegBase64(
   size: number,
   cropCenter: boolean,
 ): Promise<string> {
-  const context = ImageManipulator.manipulate(uri);
-  context.resize({ width: size, height: size });
-  if (cropCenter) {
-    const inset = Math.round(size * 0.18);
-    context.crop({
-      originX: inset,
-      originY: Math.round(inset * 0.7),
-      width: size - inset * 2,
-      height: size - inset * 2,
-    });
-    context.resize({ width: 64, height: 64 });
-  }
-  const rendered = await context.renderAsync();
-  const saved = await rendered.saveAsync({
+  const fitted = await ImageManipulator.manipulate(uri)
+    .resize({ width: cropCenter ? 240 : size })
+    .renderAsync();
+
+  const side = Math.min(fitted.width, fitted.height);
+  const originX = Math.round((fitted.width - side) / 2);
+  const originY = cropCenter
+    ? Math.max(0, Math.round((fitted.height - side) * 0.28))
+    : Math.round((fitted.height - side) / 2);
+
+  const cropped = await ImageManipulator.manipulate(fitted)
+    .crop({ originX, originY, width: side, height: side })
+    .resize({ width: cropCenter ? 64 : size, height: cropCenter ? 64 : size })
+    .renderAsync();
+
+  const saved = await cropped.saveAsync({
     format: SaveFormat.JPEG,
     compress: 0.7,
     base64: true,

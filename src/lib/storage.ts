@@ -90,6 +90,9 @@ export async function saveSession(session: Session | null): Promise<void> {
 }
 
 export async function login(username: string, password: string): Promise<Session> {
+  if (!username.trim() || !password) {
+    throw new Error('Enter a username and password');
+  }
   const users = await getUsers();
   const match = users.find(
     (user) =>
@@ -123,8 +126,12 @@ export async function addStaff(name: string, employeeId: string): Promise<{
   }
 
   const staffList = await getStaff();
+  const users = await getUsers();
   if (staffList.some((item) => item.employeeId === normalizedId)) {
     throw new Error('Employee ID already exists');
+  }
+  if (users.some((user) => user.username.toLowerCase() === normalizedId.toLowerCase())) {
+    throw new Error('That username is already taken');
   }
 
   const staff: Staff = {
@@ -140,7 +147,6 @@ export async function addStaff(name: string, employeeId: string): Promise<{
     staffId: staff.id,
   };
 
-  const users = await getUsers();
   await writeJson(KEYS.staff, [staff, ...staffList]);
   await writeJson(KEYS.users, [...users, user]);
   return {

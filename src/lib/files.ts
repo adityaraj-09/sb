@@ -8,6 +8,15 @@ function ensureDir(name: string): Directory {
   return dir;
 }
 
+export function clearStoredPhotos(): void {
+  for (const name of ['faces', 'attendance'] as const) {
+    const dir = new Directory(Paths.document, name);
+    if (dir.exists) {
+      dir.delete();
+    }
+  }
+}
+
 export async function persistPhoto(
   sourceUri: string,
   folder: 'faces' | 'attendance',

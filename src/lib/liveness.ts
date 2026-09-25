@@ -112,9 +112,8 @@ function reduceHeadTurn(
 ): LivenessSession {
   const baseline = session.baselineX ?? 0.5;
   const delta = features.centroidX - baseline;
-  const needed = session.challenge === 'turn_left' ? -HEAD_TURN_DELTA : HEAD_TURN_DELTA;
-  const turned =
-    session.challenge === 'turn_left' ? delta <= needed : delta >= needed;
+  // Front camera is mirrored, so accept a turn in either direction.
+  const turned = Math.abs(delta) >= HEAD_TURN_DELTA;
 
   if (session.phase === 'challenge' && turned) {
     return {

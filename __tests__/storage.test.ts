@@ -58,6 +58,8 @@ describe('local storage', () => {
     expect(created.username).toBe('EMP014');
     expect(created.password).toBe('staff123');
     await expect(addStaff('Other', 'EMP014')).rejects.toThrow('Employee ID already exists');
+    await expect(addStaff('Admin Clone', 'admin')).rejects.toThrow('That username is already taken');
+    await expect(login('', 'x')).rejects.toThrow('Enter a username and password');
 
     const enrolled = await saveStaffFace(created.staff.id, 'file://faces/EMP014.jpg', [0.1, 0.2]);
     expect(enrolled.faceEmbedding).toEqual([0.1, 0.2]);

@@ -1,5 +1,5 @@
 import { Redirect, useRouter } from 'expo-router';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Alert, StyleSheet, Text, View } from 'react-native';
 
 import { LivenessCamera } from '../../components/LivenessCamera';
@@ -7,37 +7,30 @@ import { ErrorText, PrimaryButton, Screen, Subtitle, Title } from '../../compone
 import { useApp } from '../../context/AppProvider';
 import { facesMatch, MATCH_THRESHOLD } from '../../lib/face';
 import { createId } from '../../lib/ids';
-import { getRequiredLocation } from '../../lib/location';
+import { getRequiredLocation, type Coordinates } from '../../lib/location';
 import { colors, space } from '../../theme';
 
 export default function MarkAttendanceScreen() {
   const router = useRouter();
   const { session, currentStaff, markAttendance } = useApp();
   const [locationError, setLocationError] = useState<string | null>(null);
-  const [coords, setCoords] = useState<{
-    latitude: number;
-    longitude: number;
-    accuracy?: number;
-  } | null>(null);
+  const [coords, setCoords] = useState<Coordinates | null>(null);
   const [busy, setBusy] = useState(false);
+  const busyRef = useRef(false);
   const attendanceId = useMemo(() => createId('att'), []);
 
-  useEffect(() => {
-    let active = true;
+  const loadLocation = () => {
+    setLocationError(null);
+    setCoords(null);
     getRequiredLocation()
-      .then((value) => {
-        if (active) {
-          setCoords(value);
-        }
-      })
+      .then(setCoords)
       .catch((error: unknown) => {
-        if (active) {
-          setLocationError(error instanceof Error ? error.message : 'Location unavailable');
-        }
+        setLocationError(error instanceof Error ? error.message : 'Location unavailable');
       });
-    return () => {
-      active = false;
-    };
+  };
+
+  useEffect(() => {
+    loadLocation();
   }, []);
 
   if (!session || session.role !== 'staff' || !currentStaff) {
@@ -58,7 +51,8 @@ export default function MarkAttendanceScreen() {
       <Screen>
         <Title>Location required</Title>
         <Subtitle>{locationError}</Subtitle>
-        <PrimaryButton title="Close" onPress={() => router.back()} />
+        <PrimaryButton title="Try again" onPress={loadLocation} />
+        <PrimaryButton title="Close" tone="ghost" onPress={() => router.back()} />
       </Screen>
     );
   }
@@ -86,9 +80,10 @@ export default function MarkAttendanceScreen() {
         mode="attendance"
         fileId={attendanceId}
         onCaptured={({ uri, embedding, challenge }) => {
-          if (busy) {
+          if (busyRef.current) {
             return;
           }
+          busyRef.current = true;
           setBusy(true);
           const matched = facesMatch(currentStaff.faceEmbedding ?? [], embedding, MATCH_THRESHOLD);
           if (!matched) {
@@ -109,11 +104,20 @@ export default function MarkAttendanceScreen() {
             accuracy: coords.accuracy,
             livenessPassed: true,
             livenessChallenge: challenge,
-          }).then(() => {
-            Alert.alert('Attendance marked', `${new Date().toLocaleString()}`, [
-              { text: 'OK', onPress: () => router.back() },
-            ]);
-          });
+          })
+            .then(() => {
+              Alert.alert('Attendance marked', `${new Date().toLocaleString()}`, [
+                { text: 'OK', onPress: () => router.back() }],
+              );
+            })
+            .catch((error: unknown) => {
+              busyRef.current = false;
+              setBusy(false);
+              Alert.alert(
+                'Could not save attendance',
+                error instanceof Error ? error.message : 'Please try again.',
+              );
+            });
         }}
       />
     </Screen>

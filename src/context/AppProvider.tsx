@@ -1,5 +1,7 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 
+import { clearStoredPhotos } from '../lib/files';
+
 import type { AttendanceRecord, Session, Staff, User } from '../types';
 import {
   addAttendance as persistAttendance,
@@ -36,7 +38,7 @@ type AppContextValue = {
 
 const AppContext = createContext<AppContextValue | null>(null);
 
-export function AppProvider({ children }: { children: React.ReactNode }) {
+export function AppProvider({ children }: { children: ReactNode }) {
   const [ready, setReady] = useState(false);
   const [session, setSession] = useState<Session | null>(null);
   const [users, setUsers] = useState<User[]>([]);
@@ -98,6 +100,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         await reload();
       },
       resetDemo: async () => {
+        try {
+          clearStoredPhotos();
+        } catch {
+          // Photo folders may not exist on first run.
+        }
         await resetAllData();
         setSession(null);
         await reload();

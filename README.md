@@ -26,7 +26,7 @@ Camera and location need a **real device**. The Android emulator camera is a poo
 
 ### Android APK
 
-A debug-signed **arm64-v8a** release APK was built here (`attendance_arm64_release.apk`, ~51 MB). It is signed with the Android debug keystore, which is fine for assignment review on a real phone. This is not Play Store signing.
+A debug-signed **arm64-v8a** release APK with the dark Cursor-like UI is on this agent run (`attendance_dark_arm64_release.apk`, ~51 MB; same bytes also as `attendance_arm64_release.apk`). It is signed with the Android debug keystore, which is fine for assignment review on a real phone. This is not Play Store signing. Install on a 64-bit Android device.
 
 Rebuild locally:
 
@@ -72,7 +72,7 @@ Login
 - Camera and location permissions are required for attendance. Location cannot be skipped.
 - Dummy passwords are stored in AsyncStorage as plain text.
 - No edit/delete staff. Re-enrol overwrites the previous face.
-- APK is built with EAS / a local Android toolchain, not in this cloud workspace.
+- APK is debug-signed and arm64-v8a only. Rebuild with the commands above or EAS.
 
 ## AI conversation
 

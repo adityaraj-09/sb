@@ -26,22 +26,23 @@ Camera and location need a **real device**. The Android emulator camera is a poo
 
 ### Android APK
 
-This environment cannot produce a signed APK (no Android SDK). Build one with EAS:
+A debug-signed release APK was built in this workspace (`android/app/build/outputs/apk/release/app-release.apk`, also saved as the `attendance-release.apk` artifact). It is signed with the Android debug keystore, which is fine for assignment review. Use a real Android device; this is not Play Store signing.
 
-```bash
-npm install -g eas-cli
-eas login
-eas build --platform android --profile preview
-```
-
-`eas.json` is set to output an APK for the `preview` and `production` profiles.
-
-Or locally, after Android Studio is installed:
+Rebuild locally:
 
 ```bash
 npx expo prebuild --platform android
-npx expo run:android --variant release
+# ANDROID_HOME must include platform android-36, build-tools 36.0.0, NDK 27.1.12297006
+cd android && ./gradlew assembleRelease
 ```
+
+Or with EAS (requires an Expo login):
+
+```bash
+npx eas-cli build --platform android --profile preview
+```
+
+`eas.json` is set to output an APK for the `preview` and `production` profiles.
 
 ## Technology / architecture
 
